@@ -1,0 +1,50 @@
+1.
+	1. A list of strings where each node of the list is the subject in the subject pool corrisponding and the string is the history 
+
+	2. Assuming everyone has different names and since everything in a set is unique,a of set strings that 
+	constains the names of everyone in cs103 that got an A because it is already known that everyone is in 
+	cs103 and has gotten an A the only requirement is recording the actual names
+
+	3. this is a map with the key being the students name in cs104(which theoretically should be unique) 
+	then the value would be a class Student. 
+
+	4. Assuming that this data type stores only the people in cs103 spring2019, this would be a map with t
+	he key being the grade as a char (A,B,C,D,F) and the value would be a string containing the students name 
+
+2. funcA takes a linkedlist and goes through the entire thing to find the last thing in that list and when it calls 
+funcB then that fucntion is recursively making each node-next-pointer point to the previous thing. So it returns a 
+linked list in the backwards order, and when getting back to funcA it correctly sets the last thing in the newly 
+arranged linked list to null. Since it is backwards the funcA returns the head of the reversed linked list if the 
+input it (1,2,3,4,5) it returns (5,4,3,2,1)
+
+3.a)
+	the most inner for loop only goes through once because the ifstatment around it means if the a[i] is 0 which 
+	cant be true because the a[i] is 1 from the loop so that and everything in it is theta(1). 
+	The second inner for-loop is running theta(0-i) which is theta(i). then the outer most for loop is 
+	going to take the summation from i = 0 to n-1 of i which is equivallent to theta(n^2) becasue of the series notation
+
+  b) 
+  	the inner function "func" is recursively so we need to do the recurrance relation. The f(n) = runtime for func(),
+	n is x because it is progressively getting smaller and allows us to hit a base case. Therun time for the base case 
+	is theta(1). For our recursive call our f(n) will be f(n-1) becasue of f(x-1). The complete recurance relations is 
+	f(n) = f(n-1) + theta(1) while f(1) = 1. Summing it up in the iterations of func from 1 - n, solved is the theta(n).
+	When looking at the outer for loop it goes from i to n solved is theta(n). the outer loop then runs from i to n 
+	which increases by a factor of 2 which is in series equivallent to theta(logn). for each of the logn itteration,
+	func() is being called which is theta(n) then our final runtime is theta(nlogn)
+	
+  c)
+	The inner most for loop runs from 0 - n which is theta(n). The if statement is dependent on i 
+	and the outer most for loop is when i is 1 it will run everytime, when i is 2 then it will run every other then
+	3 is 1/3 time and so on so the summation will be from i is 1 to n if 1/i which is equivialant to theta(logn). 
+	Including the inner for loop it will be multiplied on the summmation so that would result in theta(nlogn). 
+	Now the while loop iterates throught the list which is size of n so it will be the summation from 1 to n which will
+	be multiplied into the summation like before so it is theta(n^2 log n). Finally then the last forloop is is 
+	initializing the the nodes on the list. This will be theta(n) becasue it is linear through the list. So it is 
+	theta(n^2 logn) + theta(n). But adding it together allows us to ignore it because it is smaller than theta(n^2 logn) 
+	comparitively and so it will not be significant to theta of our runtime. So it results with a final theta(n^2 logn)
+
+  d)
+    The if statement inside wioll only trigger if i = size, and by the way i is incremented is will only go in on the third, 
+    the ninthm and the 27th, etc. time which can be wrtten as the summation of i is 0 to log base 3 n. The for loop is also 
+    dependent on the size so each time it is called it iterates to size. Because of this the summation will be i = 0 to log 
+    base 3 of n, of 3^i. This series can be writen as theta(n) + theta(n) which I simplifief to theta(n).
