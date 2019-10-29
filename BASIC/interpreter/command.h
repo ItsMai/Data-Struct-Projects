@@ -13,6 +13,8 @@ class Command{
 public:
 	virtual ~Command(){}
     virtual std::string format() const = 0;
+    virtual std::string command_name(){return "Error";}
+    virtual std::string print_(){return "Command empty";}
 
 };
 class Empty: public Command{
@@ -37,7 +39,7 @@ public:
     virtual ~Print();
     virtual std::string format() const;
     //int passed in will be -1 if 
-    void print_();
+    virtual std::string print_();
     std::string command_name(){return "PRINT";}
 
 private:
@@ -126,9 +128,9 @@ private:
 Goes back to the line gosub remembered, if there is none then
 it throws an error 
 */
-class Retur :public Command  {
+class Return :public Command  {
 public:
-    virtual ~Retur(){}
+    virtual ~Return(){}
     virtual std::string format() const;
     std::string command_name(){return "RETURN";}
 

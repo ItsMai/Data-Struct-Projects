@@ -13,6 +13,7 @@ class BooleanExpression{
 public:
     virtual ~BooleanExpression() {}
     virtual std::string format() const = 0;
+    virtual bool get_result(){return false;}
 };
 
 //BOOLEAN FUNCTIONS

@@ -19,8 +19,8 @@ Print::~Print(){
 string Print::format () const{
 	return "PRINT " + this->nexp_->format();
 }
-void Print::print_(){
-	cout << nexp_->get_val();
+string Print::print_(){
+	return to_string(nexp_->get_val());
 }
 /*
 ==========LET VARIABLE==========
@@ -98,6 +98,6 @@ string GoSub::format()const{
 /*
 ==========RETURN==========
 */
-string Retur::format()const{
+string Return::format()const{
 	return "RETURN";
 }

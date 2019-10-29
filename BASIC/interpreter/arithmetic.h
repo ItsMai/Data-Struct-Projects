@@ -11,7 +11,8 @@ class NumericExpression {
 public:
     virtual ~NumericExpression() {}
     virtual std::string format() const = 0;
-    virtual int get_val(){return 0;}
+    virtual int get_val(){return 9;}
+    virtual int get_result(){return 0;}
 };
 
 /*
@@ -44,7 +45,7 @@ public:
 
 private:
     std::string name_;
-    int val_;
+    int val_ = 9;
 };
 /*
 Arrays can store the name and has an infinite amount of 
@@ -61,7 +62,7 @@ public:
     std::string get_name();
     bool is_array(){return true;}
 private:
-    int val_ = 0;
+    int val_ = -17;
 	std::string name_;
     NumericExpression* array_;
 };
@@ -77,7 +78,7 @@ public:
     AdditionExpression(NumericExpression* left, NumericExpression* right);
     virtual~AdditionExpression();
     virtual std::string format() const;
-    int get_sum();
+    virtual int get_result();
 private:
     NumericExpression* left;
     NumericExpression* right;
@@ -92,7 +93,7 @@ public:
     SubtractionExpression(NumericExpression* left, NumericExpression* right);
     virtual~SubtractionExpression();
     virtual std::string format() const;
-    int get_diff();
+    virtual int get_result();
 
 private:
     NumericExpression* left;
@@ -108,7 +109,7 @@ public:
     DivisionExpression(NumericExpression* left, NumericExpression* right);
     virtual~DivisionExpression();
     virtual std::string format() const;
-    int get_quo();
+    virtual int get_result();
 
 private:
     NumericExpression* left;
@@ -123,7 +124,7 @@ public:
     MultiplyExpression(NumericExpression* left, NumericExpression* right);
     virtual~MultiplyExpression();
     virtual std::string format() const;
-    int get_prod();
+    virtual int get_result();
 
 private:
     NumericExpression* left;

@@ -82,7 +82,7 @@ string AdditionExpression::format() const {
     return "(" + this->left->format() + " + " + this->right->format() + ")";
 }
 
-int AdditionExpression::get_sum(){
+int AdditionExpression::get_result(){
     sum_ = this->left->get_val() + this->right->get_val();
     return sum_;
     return 0;
@@ -100,7 +100,7 @@ SubtractionExpression::~SubtractionExpression() {
 string SubtractionExpression::format() const {
     return "(" + this->left->format() + " - " + this->right->format() + ")";
 }
-int SubtractionExpression::get_diff(){
+int SubtractionExpression::get_result(){
     diff_ = this->left->get_val() - this->right->get_val();
     return diff_;
 }
@@ -119,11 +119,12 @@ string DivisionExpression::format() const {
     return "(" + this->left->format() + " / " + this->right->format() + ")";
 }
 
-int DivisionExpression::get_quo(){
-    if(right == 0){
-        throw invalid_argument("divided be zero");
+int DivisionExpression::get_result(){
+    if(this->right->get_val() == 0 && (this->left->get_val() != 0)){
+        throw invalid_argument("divided by zero");
     }
-    quo_ = this->left->get_val() / this->right->get_val();
+    quo_ = (int)(this->left->get_val() / this->right->get_val());
+    cerr << quo_ << endl;
     return quo_;
 }
 /*
@@ -140,7 +141,7 @@ MultiplyExpression::~MultiplyExpression() {
 string MultiplyExpression::format() const {
     return "(" + this->left->format() + " * " + this->right->format() + ")";
 }
-int MultiplyExpression::get_prod(){
+int MultiplyExpression::get_result(){
     prod_ = this->left->get_val() * this->right->get_val();
     return prod_;
 }

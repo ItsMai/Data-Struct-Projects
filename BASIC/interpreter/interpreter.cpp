@@ -15,114 +15,6 @@ Interpreter::Interpreter(istream& in) {
     this->parse(in);
 }
 
-NumericExpression* Interpreter::parse_constant(string line, int &position){
-	bool neg = false;
-	string temp = "";
-	//if its a negative number check
-	if(line[position] == '-'){
-		neg = true;
-		position++;
-	}
-	while(line[position] != ']' && line[position] != ')' && line[position] != '+' && 
-		line[position] != '-' && line[position] != '*' &&line[position] != '/' && position!=(signed)line.size()){
-		if(position == (signed)line.size()){
-			break;
-		}
-		temp +=  line[position];
-		position++;
-	}
-	//if it is a negative number then make it to int then neg then new constant
-	if(neg){
-		int sneeze = stoi(temp);
-		sneeze = sneeze *(-1);
-		NumericExpression* m  = new Constant(sneeze);
-		return m;
-	}
-	NumericExpression* m = new Constant(stoi(temp));
-	return m;
-}
-
-string Interpreter::parse_variable_name(string line, int &position){
-	string var = "";
-	while(line[position] != '[' && line[position] != ']' && 
-		line[position] != '-' && line[position] != '*' &&line[position] != '/' &&
-		line[position] != '(' && line[position] != ')' && line[position] != '+' && position!=(signed)line.size()){
-		var += line[position];
-		position++;
-	}
-	return var;
-}
-
-BooleanExpression* Interpreter::boolParse(string parse){
-	int posin;
-	for(unsigned int i = 0; i < parse.size(); i++){
-		if (parse[i] == '<' || parse[i] == '>' || parse[i] == '='){
-			posin = i;
-			break;
-		}
-	}
-	string left = "";
-	string right = "";
-	for(int i = 0; i < posin ; i++){
-		left += parse[i];
-	}
-	for(unsigned int i = posin+1; i < parse.size() ; i++){
-		right += parse[i];
-	}
-	char op = parse[posin];
-	int o = 0;
-	NumericExpression* l = nexpParse(left, o);
-	o = 0;
-	NumericExpression* r = nexpParse(right, o);
-	 if(op == '<'){
-	 	BooleanExpression* m = new LessExpression(l,r);
-	 	return m;
-	 }else if (op == '>'){
-	 	BooleanExpression* m = new GreaterExpression(l,r);
-	 	return m;
-	 }else if(op == '='){
-	 	BooleanExpression* m = new EqualsExpression(l,r);
-	 	return m;
-	 }else{//error case
-	 	BooleanExpression*m = new EqualsExpression(l,r);
-	 	return m;
-	 }
-}
-
-NumericExpression* Interpreter::nexpParse(string toParse, int &position){
-	if(isdigit(toParse[position]) || toParse[position] == '-'){ 						//constant case
-		return parse_constant(toParse, position);
-	}else if(isalpha(toParse[position])){
-		string variableName = parse_variable_name(toParse,position);
-		if(toParse[position] != '['){													//after getting the name, its a variable
-			return new IntVariable(variableName);
-		}else{
-			position++;																	//skipping over [
-			NumericExpression* ix = nexpParse(toParse,position);
-			position++;																	//skipping over ]
-			return new ArVariable(variableName, ix);
-		}
-	}else{ 																				//binary operator -+/*
-		position++;
-		NumericExpression* left = nexpParse(toParse, position);
-		char op = toParse[position];
-		position++;
-		NumericExpression* right = nexpParse(toParse, position);
-		position++;
-		if(op == '+'){
-			return new AdditionExpression(left,right);
-		}else if(op == '-'){
-			return new SubtractionExpression(left,right);
-		}else if(op == '*'){
-			return new MultiplyExpression(left,right);
-		}else if(op == '/'){
-			return new DivisionExpression(left,right);
-		}else{
-			return new DivisionExpression(left,right);
-		}
-	}
-}
-
 void Interpreter::parse(istream& in) {
 	int o =0;																				// passing an int to be by reference
     string line;
@@ -171,7 +63,8 @@ void Interpreter::parse(istream& in) {
         				rest += temp;
         			}
         			o = 0;
-        			NumericExpression* nexp = nexpParse(rest, o);						//parse for arguemnt for value
+                    int nexp_result = 0;
+        			NumericExpression* nexp = nexpParse(rest, o, nexp_result);			//parse for arguemnt for value
         			NumericExpression* varname = new IntVariable(variable);				//the var name is set to an int variable
         			Command*m = new LetI(varname, nexp);
         			out_lines.push_back(line_number + " " + m->format());
@@ -223,6 +116,7 @@ void Interpreter::parse(istream& in) {
         		}
         		string ix = "";															//index
         		NumericExpression* index;
+                int ix_result = 0;
         		int ix_string = 0;														//position where the rest of the let is
         		if(check_open != -1){
         			int open_bracket_amount = 1;
@@ -242,7 +136,8 @@ void Interpreter::parse(istream& in) {
       					inside_brackets += next[i];
       				}
         			o = 0;
-        			index = nexpParse(inside_brackets,o);								//parse what is inside the brackets
+
+        			index = nexpParse(inside_brackets,o, ix_result);					//parse what is inside the brackets
         		}else{
 	        		for(int i = 0; i < (signed) next.size(); i++){
 		       			if(next[i] == ']'){
@@ -254,7 +149,8 @@ void Interpreter::parse(istream& in) {
 	        			ix += next[i];
 	        		}
 	        		o = 0;
-	        		index = nexpParse(ix, o);
+	        		index = nexpParse(ix, o, ix_result);
+                    cerr << "ix_result : " << ix_result << endl;
         		}
         		string nexp = "";
         		for(unsigned int i = ix_string+1 ; i < next.size();i++){	        	//gets the rest of the string to go in the variable
@@ -262,11 +158,19 @@ void Interpreter::parse(istream& in) {
         			nexp += next[i];
         		}
         		o = 0;
-        		NumericExpression* exp = nexpParse(nexp, o);
-        		NumericExpression* ary = new ArVariable(variable, index);				//new array
-        		Command* let = new LetA(ary, exp);											//new let command
-        		line_command[stoi(line_number)] = let;
-    			out_lines.push_back(line_number + " " + let->format());
+                int exp_result = 0;
+                //pretty print
+                NumericExpression* pretty_exp = nexpParse(nexp, o, exp_result);
+                NumericExpression* pretty_print_ary = new ArVariable(variable, index);  //new array
+                Command* pretty_let = new LetA(pretty_print_ary, pretty_exp);           //new let command for pretty printing
+    			out_lines.push_back(line_number + " " + pretty_let->format());
+                //functionality
+                NumericExpression* exp = new Constant(exp_result);
+                NumericExpression* index_done = new Constant(ix_result);
+                NumericExpression* ary = new ArVariable(variable, index_done);          //new array
+                Command* let = new LetA(ary, exp);
+                line_command[stoi(line_number)] = let;
+
         	}
         }else if(command_name == "PRINT" || command_name == "IF"){
         	string temp;
@@ -274,13 +178,17 @@ void Interpreter::parse(istream& in) {
         	while(stream >> temp){
         		restString += temp;
         	}        	
-
         	if(command_name == "PRINT"){
         		o = 0;
-       			NumericExpression* nexp = nexpParse(restString, o);
-       			Command *print = new Print(nexp);
+                int print_result = 0;
+                //pretty print
+                NumericExpression* prettyp_nexp = nexpParse(restString, o, print_result);
+                Command *pretty_print = new Print(prettyp_nexp);
+                out_lines.push_back(line_number + " " + pretty_print->format());
+                //functionality
+                NumericExpression* nexp = new Constant(print_result);
+                Command *print = new Print(nexp);
        			line_command[stoi(line_number)] = print;
-       			out_lines.push_back(line_number + " " + print->format());
         	}else if(command_name == "IF"){
         		int posi = 0;															//position found where is the then begins
         		for(unsigned int i = 0; i < restString.size() - 3 ; i++){ 				//Checking where the THEN is 
@@ -293,16 +201,19 @@ void Interpreter::parse(istream& in) {
         		for(int i = 0; i < posi ; i++ ){
         			boo+= restString[i];
         		}
-        		o = 0;
-        		BooleanExpression* bexp = boolParse(boo);
         		string jline = "";
         		for(unsigned int i = posi+4; i < restString.size(); i++){
         			jline += restString[i];
         		}																		//getting the line to jump to 
         		int jump = stoi(jline);
-        		Command* if_then = new IfThen(&jump, bexp);
-        		line_command[stoi(line_number)] = if_then;
-        		out_lines.push_back(line_number + " " + if_then->format());
+                //pretty printing
+                BooleanExpression* pretty_bexp = boolParse(boo);
+                Command* pretty_if_then = new IfThen(&jump, pretty_bexp);
+        		out_lines.push_back(line_number + " " + pretty_if_then->format());
+                //functionality
+                BooleanExpression* bexp = boolParse_done(boo);
+                Command* if_then = new IfThen(&jump, bexp);
+                line_command[stoi(line_number)] = if_then;
         	}
         }else if(command_name == "GOSUB"){
         	string temp;
@@ -319,15 +230,17 @@ void Interpreter::parse(istream& in) {
         	stream >> temp;
         	jline = stoi(temp); 														//read in the number line to jump to 
         	Command* go_to = new GoTo(&jline);
-        	out_lines.push_back(line_number + " " + (go_to->format())); 					//push it into the vector of lines
+            //pretty print
+        	out_lines.push_back(line_number + " " + (go_to->format())); 				//push it into the vector of lines
+            //functionality
         	line_command[stoi(line_number)] = go_to;
        	}else if(command_name == "RETURN"){
+            //pretty printing
         	out_lines.push_back(line_number + " RETURN");
-        	Command* ret = new Retur; 
+            //functionality
+        	Command* ret = new Return; 
         	line_command[stoi(line_number)] = ret;
-        	
         }
-    	
 	}
 }
 
@@ -336,4 +249,15 @@ void Interpreter::write(ostream& out) {
 	for(unsigned int i = 0; i < out_lines.size(); i++){
 		out << out_lines[i] << endl;
 	} 
+}
+
+void Interpreter::functionality(){
+    for(map<int, Command*>::iterator it = line_command.begin(); it != line_command.end(); it++){
+        if(it->second->command_name() == "PRINT"){                  //Prints out the NUMERIC expression, newline after
+            cout << it->second->print_() << "\n";
+        }else if(it->second->command_name() == "LETA"){
+            
+        }
+
+    }
 }
