@@ -15,6 +15,186 @@ Interpreter::Interpreter(istream& in) {
     this->parse(in);
 }
 
+
+NumericExpression* Interpreter::parse_constant(string line, int &position, int& number){
+    bool neg = false;
+    string temp = "";
+    if(line[position] == '-'){                                                          //if its a negative number check
+        neg = true;
+        position++;
+    }
+    while(line[position] != ']' && line[position] != ')' && line[position] != '+' && 
+        line[position] != '-' && line[position] != '*' &&line[position] != '/' && position!=(signed)line.size()){
+        if(position == (signed)line.size()){
+            break;
+        }
+        temp +=  line[position];
+        position++;
+    }
+    //if it is a negative number then make it to int then neg then new constant
+    if(neg){
+        int sneeze = stoi(temp);
+        sneeze = sneeze *(-1);
+        number = sneeze;
+        NumericExpression* m  = new Constant(sneeze);
+        return m;
+    }
+    number = stoi(temp);
+    NumericExpression* m = new Constant(stoi(temp));
+    return m;
+}
+
+string Interpreter::parse_variable_name(string line, int &position){
+    string var = "";
+    while(line[position] != '[' && line[position] != ']' && 
+        line[position] != '-' && line[position] != '*' &&line[position] != '/' &&
+        line[position] != '(' && line[position] != ')' && line[position] != '+' && position!=(signed)line.size()){
+        var += line[position];
+        position++;
+    }
+    return var;
+}
+
+NumericExpression* Interpreter::nexpParse(string toParse, int &position, int &result){
+    if(isdigit(toParse[position]) || toParse[position] == '-'){                         //constant case
+        int number = 0;
+        NumericExpression *constant_parsed = parse_constant(toParse, position, number);
+        if(result == 0){                                                                //checking if nothing has been pared yet
+            result = number;
+        }
+        return constant_parsed;
+    }else if(isalpha(toParse[position])){
+        string variableName = parse_variable_name(toParse,position);
+        if(toParse[position] != '['){                                                   //after getting the name, its a variable
+            NumericExpression* int_var = new IntVariable(variableName);
+            if(result == 0){
+                result = int_var->get_val();
+            }
+            return int_var;
+        }else{
+            position++;                                                                 //skipping over [
+            NumericExpression* ix = nexpParse(toParse,position, result);
+            position++;                                                                 //skipping over ]
+            return new ArVariable(variableName, ix);
+        }
+    }else{                                                                              //binary operator -+/*
+        position++;
+        NumericExpression* left = nexpParse(toParse, position, result);
+        char op = toParse[position];
+        position++;
+        NumericExpression* right = nexpParse(toParse, position, result);
+        position++;
+
+        if(op == '+'){
+            NumericExpression* prettyp = new AdditionExpression(left,right);
+            result = prettyp->get_result();
+            return prettyp;
+        }else if(op == '-'){
+            NumericExpression* prettyp = new SubtractionExpression(left,right);
+            result = prettyp->get_result();
+            return prettyp;
+        }else if(op == '*'){
+            NumericExpression* prettyp = new MultiplyExpression(left,right);
+            result = prettyp->get_result();
+            return prettyp;
+        }else if(op == '/'){
+            NumericExpression* prettyp = new DivisionExpression(left,right);
+            result = prettyp->get_result();
+            return prettyp;
+        }else{
+            NumericExpression* prettyp = new DivisionExpression(left,right);
+            return prettyp;
+        }
+    }
+}
+
+
+
+BooleanExpression* Interpreter::boolParse(string parse){
+    int posin;
+    for(unsigned int i = 0; i < parse.size(); i++){
+        if (parse[i] == '<' || parse[i] == '>' || parse[i] == '='){
+            posin = i;
+            break;
+        }else{
+            posin = 0;
+        }
+    }
+    string left = "";
+    string right = "";
+    for(int i = 0; i < posin ; i++){
+        left += parse[i];
+    }
+    for(unsigned int i = posin+1; i < parse.size() ; i++){
+        right += parse[i];
+    }
+    char op = parse[posin];
+    int o = 0;
+    int l_result = 0;
+    int r_result = 0;
+    NumericExpression* l = nexpParse(left, o, l_result);
+    o = 0;
+    NumericExpression* r = nexpParse(right, o, r_result);
+     if(op == '<'){
+        BooleanExpression* m = new LessExpression(l,r);
+        return m;
+     }else if (op == '>'){
+        BooleanExpression* m = new GreaterExpression(l,r);
+        return m;
+     }else if(op == '='){
+        BooleanExpression* m = new EqualsExpression(l,r);
+        return m;
+     }else{//error case
+        BooleanExpression*m = new EqualsExpression(l,r);
+        return m;
+     }
+}
+
+BooleanExpression* Interpreter::boolParse_done(string parse){
+    int posin;
+    for(unsigned int i = 0; i < parse.size(); i++){
+        if (parse[i] == '<' || parse[i] == '>' || parse[i] == '='){
+            posin = i;
+            break;
+        }else{
+            posin = 0;
+        }
+    }
+    string left = "";
+    string right = "";
+    for(int i = 0; i < posin ; i++){
+        left += parse[i];
+    }
+    for(unsigned int i = posin+1; i < parse.size() ; i++){
+        right += parse[i];
+    }
+    char op = parse[posin];
+    int o = 0;
+    int l_result = 0;
+    int r_result = 0;
+    NumericExpression* l = nexpParse(left, o, l_result);
+    o = 0;
+    NumericExpression* r = nexpParse(right, o, r_result);
+    NumericExpression* left_done = new Constant(l_result);
+    NumericExpression* right_done = new Constant(r_result);
+        //warning fix
+    l = r;
+    r = l;
+     if(op == '<'){
+        BooleanExpression* m = new LessExpression(left_done,right_done);
+        return m;
+     }else if (op == '>'){
+        BooleanExpression* m = new GreaterExpression(left_done,right_done);
+        return m;
+     }else if(op == '='){
+        BooleanExpression* m = new EqualsExpression(left_done,right_done);
+        return m;
+     }else{//error case
+        BooleanExpression*m = new EqualsExpression(left_done,right_done);
+        return m;
+     }
+}
+
 void Interpreter::parse(istream& in) {
 	int o =0;																				// passing an int to be by reference
     string line;
@@ -66,8 +246,10 @@ void Interpreter::parse(istream& in) {
                     int nexp_result = 0;
         			NumericExpression* nexp = nexpParse(rest, o, nexp_result);			//parse for arguemnt for value
         			NumericExpression* varname = new IntVariable(variable);				//the var name is set to an int variable
-        			Command*m = new LetI(varname, nexp);
-        			out_lines.push_back(line_number + " " + m->format());
+                    //pretty printing
+        			Command* pretty_var = new LetI(varname, nexp);
+                    int_var[variable] = nexp_result;
+        			out_lines.push_back(line_number + " " + pretty_var->format());
         		}
         	}
         	if(array){/////////////////////work for an array
@@ -136,7 +318,6 @@ void Interpreter::parse(istream& in) {
       					inside_brackets += next[i];
       				}
         			o = 0;
-
         			index = nexpParse(inside_brackets,o, ix_result);					//parse what is inside the brackets
         		}else{
 	        		for(int i = 0; i < (signed) next.size(); i++){
@@ -150,7 +331,6 @@ void Interpreter::parse(istream& in) {
 	        		}
 	        		o = 0;
 	        		index = nexpParse(ix, o, ix_result);
-                    cerr << "ix_result : " << ix_result << endl;
         		}
         		string nexp = "";
         		for(unsigned int i = ix_string+1 ; i < next.size();i++){	        	//gets the rest of the string to go in the variable
@@ -255,8 +435,13 @@ void Interpreter::functionality(){
     for(map<int, Command*>::iterator it = line_command.begin(); it != line_command.end(); it++){
         if(it->second->command_name() == "PRINT"){                  //Prints out the NUMERIC expression, newline after
             cout << it->second->print_() << "\n";
+        }else if(it->second->command_name() == "LETI"){
         }else if(it->second->command_name() == "LETA"){
-            
+        }else if(it->second->command_name() == "GOTO"){
+        }else if(it->second->command_name() == "IFTHEN"){
+        }else if(it->second->command_name() == "GOSUB"){
+        }else if(it->second->command_name() == "RETURN"){
+        }else if(it->second->command_name() == "GOTO"){
         }
 
     }

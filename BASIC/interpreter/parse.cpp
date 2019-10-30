@@ -10,6 +10,9 @@
 
 using namespace std;
 
+map<string, NumericExpression*> int_map;
+map<string, map<int, NumericExpression*>> ar_map;
+
 NumericExpression* parse_constant(string line, int &position, int& number){
 	bool neg = false;
 	string temp = "";
@@ -49,59 +52,6 @@ string parse_variable_name(string line, int &position){
 	return var;
 }
 
-NumericExpression* nexpParse(string toParse, int &position, int &result){
-	if(isdigit(toParse[position]) || toParse[position] == '-'){ 						//constant case
-		int number = 0;
-		NumericExpression *constant_parsed = parse_constant(toParse, position, number);
-		if(result == 0){																//checking if nothing has been pared yet
-			result = number;
-		}
-		return constant_parsed;
-	}else if(isalpha(toParse[position])){
-		string variableName = parse_variable_name(toParse,position);
-		if(toParse[position] != '['){													//after getting the name, its a variable
-			NumericExpression* int_var = new IntVariable(variableName);
-			if(result == 0){
-				result = int_var->get_val();
-				cerr << result << endl;
-			}
-			return int_var;
-		}else{
-			position++;																	//skipping over [
-			NumericExpression* ix = nexpParse(toParse,position, result);
-			position++;																	//skipping over ]
-			return new ArVariable(variableName, ix);
-		}
-	}else{ 																				//binary operator -+/*
-		position++;
-		NumericExpression* left = nexpParse(toParse, position, result);
-		char op = toParse[position];
-		position++;
-		NumericExpression* right = nexpParse(toParse, position, result);
-		position++;
-
-		if(op == '+'){
-			NumericExpression* prettyp = new AdditionExpression(left,right);
-			result = prettyp->get_result();
-			return prettyp;
-		}else if(op == '-'){
-			NumericExpression* prettyp = new SubtractionExpression(left,right);
-			result = prettyp->get_result();
-			return prettyp;
-		}else if(op == '*'){
-			NumericExpression* prettyp = new MultiplyExpression(left,right);
-			result = prettyp->get_result();
-			return prettyp;
-		}else if(op == '/'){
-			NumericExpression* prettyp = new DivisionExpression(left,right);
-			result = prettyp->get_result();
-			return prettyp;
-		}else{
-			NumericExpression* prettyp = new DivisionExpression(left,right);
-			return prettyp;
-		}
-	}
-}
 
 BooleanExpression* boolParse(string parse){
 	int posin;
@@ -187,4 +137,3 @@ BooleanExpression* boolParse_done(string parse){
 	 	return m;
 	 }
 }
-

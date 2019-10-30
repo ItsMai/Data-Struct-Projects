@@ -45,7 +45,7 @@ public:
 
 private:
     std::string name_;
-    int val_ = 9;
+    int val_ = 0;
 };
 /*
 Arrays can store the name and has an infinite amount of 
@@ -62,7 +62,7 @@ public:
     std::string get_name();
     bool is_array(){return true;}
 private:
-    int val_ = -17;
+    int val_ = 0;
 	std::string name_;
     NumericExpression* array_;
 };

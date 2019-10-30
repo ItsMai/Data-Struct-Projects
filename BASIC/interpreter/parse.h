@@ -11,6 +11,8 @@
 #include <fstream>
 #include <stdlib.h> 	//atoi
 
+
+
 NumericExpression* nexpParse(std::string, int&, int&);
     /*
     Pretty printing = Parsing numericExpression with a left and a right for pretty
