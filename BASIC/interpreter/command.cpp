@@ -19,8 +19,8 @@ Print::~Print(){
 string Print::format () const{
 	return "PRINT " + this->nexp_->format();
 }
-string Print::print_(){
-	return to_string(nexp_->get_val());
+NumericExpression* Print::get_nexp(){
+	return nexp_;
 }
 /*
 ==========LET VARIABLE==========
@@ -33,9 +33,6 @@ LetI::~LetI(){
 }
 string LetI::format () const{
 	return "LET " + this->var_->format() + " " + this->nexp_->format(); 
-}
-void LetI::let_var(int value){
-	
 }
 /*
 ==========LET ARRAY==========
@@ -53,46 +50,41 @@ string LetA::format () const{
 /*
 ==========GOTO==========
 */
-GoTo::GoTo(int* jline_): jline_(jline_){
+GoTo::GoTo(int jline){
+	jline_ = jline;
 }
 GoTo::~GoTo(){
-	delete this->jline_;
 }
 
 string GoTo::format()const{
-	string jumpstring = to_string(*jline_);
+	string jumpstring = to_string(jline_);
 	return "GOTO <" + jumpstring + ">";
 }
 /*
 ==========IF THEN==========
 */
-IfThen::IfThen(int* jline, BooleanExpression* check){
-
-	this->jline_ = jline;
+IfThen::IfThen(int jline, BooleanExpression* check){
+	jline_ = jline;
 	this->check_ = check;
 }
 IfThen::~IfThen(){
-	delete this->jline_;
 	delete this->check_;
 }
 
 string IfThen::format()const{
-	return "IF " + this->check_->format() + " THEN <" + to_string(*jline_) + ">";
+	return "IF " + this->check_->format() + " THEN <" + to_string(jline_) + ">";
 }
 /*
 ==========GOSUB==========
 */
-GoSub::GoSub(int* jline, int* prev){
-	this->jline_=jline; 
-	this->prev_ =prev;
+GoSub::GoSub(int jline){
+	jline_=jline; 
 }
 GoSub::~GoSub(){
-	delete this->jline_;
-	delete this->prev_;
 }
 
 string GoSub::format()const{
-	return "GOSUB <" + to_string(*jline_) + ">";
+	return "GOSUB <" + to_string(jline_) + ">";
 }
 
 /*

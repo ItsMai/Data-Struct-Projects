@@ -11,8 +11,12 @@ class NumericExpression {
 public:
     virtual ~NumericExpression() {}
     virtual std::string format() const = 0;
-    virtual int get_val(){return 9;}
+    int get_val(){return val_;}
     virtual int get_result(){return 0;}
+    void set(int k){ val_ = k;}
+protected:
+    int val_;
+
 };
 
 /*
@@ -24,10 +28,6 @@ public:
     Constant(int);
     virtual ~Constant(){}
     virtual std::string format() const;
-    int get_val();
-
-private:
-	int val_;
 };
 /*
 Variables can store an int and a value
@@ -38,14 +38,11 @@ public:
     IntVariable(std::string);
     virtual~IntVariable(){}
     virtual std::string format() const;
-    void set(int);
-    int get_val();
     std::string get_name();
     bool is_array(){return false;}
 
 private:
     std::string name_;
-    int val_ = 0;
 };
 /*
 Arrays can store the name and has an infinite amount of 
@@ -57,12 +54,9 @@ public:
     ArVariable(std::string, NumericExpression*);
     virtual~ArVariable();
     virtual std::string format() const;
-    void set(int);
-    int get_val();
     std::string get_name();
     bool is_array(){return true;}
 private:
-    int val_ = 0;
 	std::string name_;
     NumericExpression* array_;
 };
@@ -82,7 +76,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    int sum_;
 
 };
 /*
@@ -98,7 +91,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    int diff_;
 };
 /*
 Division will divide the left/right. It will throw invalid_argument
@@ -114,7 +106,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    int quo_;
 };
 /*
 Multiplies left*right.
@@ -129,7 +120,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    int prod_;
 };
 
 #endif

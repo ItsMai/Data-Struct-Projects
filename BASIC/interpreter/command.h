@@ -14,18 +14,21 @@ public:
 	virtual ~Command(){}
     virtual std::string format() const = 0;
     virtual std::string command_name(){return "Error";}
-    virtual std::string print_(){return "Command empty";}
-
+    virtual NumericExpression* get_nexp(){
+        NumericExpression* j = new Constant(0);
+        return j;
+    }
+    virtual int get_jline(){return -1;}
 };
 class Empty: public Command{
     virtual ~Empty(){}
-    virtual std::string format() const{return "empty";}
+    virtual std::string format() const{return "EMPTY";}
     std::string command_name(){return "EMPTY";}
 
 };
 class End: public Command{
     virtual ~End(){}
-    virtual std::string format() const{return "end";}
+    virtual std::string format() const{return "END";}
     std::string command_name(){return "END";}
 
 };
@@ -39,7 +42,7 @@ public:
     virtual ~Print();
     virtual std::string format() const;
     //int passed in will be -1 if 
-    virtual std::string print_();
+     NumericExpression* get_nexp();
     std::string command_name(){return "PRINT";}
 
 private:
@@ -55,7 +58,6 @@ public:
     LetI(NumericExpression*, NumericExpression*);
     virtual ~LetI();
     virtual std::string format() const;
-    void let_var(int value);
     std::string command_name(){return "LETI";}
 
 
@@ -84,28 +86,28 @@ Just jumps to a line
 */
 class GoTo : public Command {
 public:
-    GoTo(int*);
+    GoTo(int);
     virtual ~GoTo();
     virtual std::string format() const;
     std::string command_name(){return "GOTO";}
-
+    virtual int get_jline(){return jline_;}
 
 private:
-	int* jline_;
+	int jline_;
 };
 /*
 if a bool expression is true then jump to a line
 */
 class IfThen : public Command {
 public:
-    IfThen(int*, BooleanExpression*);
+    IfThen(int, BooleanExpression*);
     virtual ~IfThen();
     virtual std::string format() const;
     std::string command_name(){return "IFTHEN";}
-
+    virtual int get_jline(){return jline_;}
 
 private:
-	int* jline_;
+	int jline_;
 	BooleanExpression* check_;
 };
 
@@ -114,15 +116,15 @@ It jumps to a line but it remembers where it came from
 */
 class GoSub : public Command  {
 public:
-    GoSub(int*, int*);
+    GoSub(int);
     virtual ~GoSub();
     virtual std::string format() const;
     std::string command_name(){return "GOSUB";}
+    virtual int get_jline(){return jline_;}
 
 
 private:
-	int* jline_;
-	int* prev_;
+	int jline_;
 };
 /*
 Goes back to the line gosub remembered, if there is none then

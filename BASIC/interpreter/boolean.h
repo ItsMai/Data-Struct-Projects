@@ -14,6 +14,8 @@ public:
     virtual ~BooleanExpression() {}
     virtual std::string format() const = 0;
     virtual bool get_result(){return false;}
+protected:
+    bool result_ = false;
 };
 
 //BOOLEAN FUNCTIONS
@@ -31,7 +33,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    bool result_ = false;
 };
 /*
 Returns true if the left is greater than the right STRICLY 
@@ -46,7 +47,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    bool result_ = false;
 };
 /*
 Returns true if the left is less than the right STRICLY 
@@ -61,7 +61,6 @@ public:
 private:
     NumericExpression* left;
     NumericExpression* right;
-    bool result_ = false;
 };
 
 
