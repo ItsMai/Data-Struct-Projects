@@ -71,6 +71,9 @@ private:
     std:: map<std::string, std::map<int, NumericExpression* > > array_variables;
     //determines how many times pretty print is put into the vector
     bool done = false;
+    int error_line = -1;
+    int current_line_error = -1;
+    std::string error_string = "";
 };
 
 #endif 

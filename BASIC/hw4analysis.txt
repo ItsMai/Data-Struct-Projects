@@ -1,0 +1,73 @@
+1. 
+GOTO(interpreter.cpp::lines 474- 481)
+First thing that happens is getting the second pointer to the 
+Command then calling the line number saved in the pointer within the command pointer. Then outside of 
+that is the find function for a map which goes through the map as the key is ordered, which from cplus 
+reference is log in size so theta(log(size)) because it has to iterate through the map and checks each key to see if 
+it matches and if it does it returns the iterator at that key. If that is equal to the end then it triggers the if 
+statment, that runs on theta(1) then returns out of the function. If the "if-statement" is not
+triggered then it sets the iterator to the same thing checked in the if statement which is was evaluated
+at theta(log(size)). For GOTO the worst case is will be theta(log(size)) + theta(log(size)) which 
+results to theta(log(size)).
+
+GOSUB(interpreter.cpp::lines )
+GOSUB works almost just as GOTO but has an extra line. This extra line is pushing the line int 
+into the stack made to remember the lines that GOSUB remembers and then RETURN uses. The run
+time to push to a stack is one to one with push_back which is just theta(1) because it just adds
+to the top, no searching or iterating or shifting through is needed. By doing so, the run time
+for GOSUB is theta(1) + theta(log(size)) which results in theta(log(size)).
+
+IF(interpreter.cpp::lines )
+The first couple of lines is making a string of what the original line was. Then after is the
+parse_if() function. This function is used because while going line by line the numericexpression
+used in the left or the right could be updated as returns are called. Ex: if LET X (X+1) is hit multiple
+times the value changes and while X could be 3 at one point in the code it might be 5 at another point in
+the code. So thus parse if takes the left and the right and finds whether it is true or false at that line.
+As said on the bytes pages, finding the result of the boolean expression does not need to be evalutated, we continue.
+The next lines is an ifstatement that is proceeding if the if statement is true, if true then it goes into 
+the .find() funtion to set the line number it needs to iterate next to. As said previously that evaluates to 
+theta(log(size)). So the full run time(ignoring the run of the boolean) is theta(log(size)).
+
+2.
+RETURN(interpreter.cpp::lines )
+Functionality() depends on the input file being parsed so after that the finished every line is put into a map<int, Command*> 
+then it goes into the iterator of that map which can take theta(size) to actually find the line where return is the Command.
+Once entering the if-statement, it checks if the stack is empty which runs at theta(1) then inside is just a cout statement 
+of the error which is theta(1) then it returns. The other case is if the stack isnt empty then it will find the int in the
+stack that is at the top which is calling back on the underlying container so it takes theta(1). It pops from the stack which is 
+removing the top which is also theta(1). Now that we have the int of where the line should go to, it sets the iterator to the line
+found at the top of the stack before popping using .find(). As said before the .find() function is theta(log(size)) because it
+searches for the key like binary search and since it is incrementing in a constant fashion it should be evenly distributed.
+After setting the iterator, it increments to the next key which goes to the next line because return is going to the line after
+the remembered line was otherwise it would go in an infinite loop pushing then popping. This increment is theta(1) so the return 
+takes a theta(1). If including the runtime from the parse() as f(n), then the runtime is theta(1) + f(n)
+
+3. ex: (interpreter.cpp::lines 244)
+Finding value of a variable is done mulitple times but each and every time a .find() is used to look at the map, where I look
+for the updated value of that variable name. First I set the value of the parsed NumericExpression by doing set() which is a
+function that runs at a theta(1) and a get() that also runs at theta(1) by just returning the private variables.
+The map is map<string, NumericExpression*> which they key is the variable name and
+First an iterator is made starting on the .find() of the variable name which takes theta(log(size)).Then it goes into an if 
+statement to check if the variable exists or not since the iterator is already set at the location of the variable wanted. This if 
+statement takes theta(1). Then on the inside of this if statment it erases the key of the variable which takes theta(1). Now that 
+there is no key with that variable then a replacement of the parsed Numeric Expression can be set. Inserting the key back in with
+the new NumericExpression takes theta(log(size)) since we are inserting only one element into the map. Both of these are theta(1) + 
+theta(log(size)) which results in theta(log(size)). The else statement just inserts the one element if the variable name does not 
+already exist which also takes theta(log(size)). So the total if statement is theta(log(size)). Since the .find() takes 
+theta(log(size)) and the if statement takes theta(log(size)) then adding them together will just be able to pull out a factor
+of two so the full run time is theta(log(size)) 
+
+4.
+ex: (interpreter.cpp::lines 355 )
+Finding the value of the array is different because I use an embedded map. My map for arrays is 
+map<string, map<int, NumericExpression*>> as the keys are the variable name then the position. 
+First thing done is finding the .find() on the variable name to see if the name exists in the map which takes theta(log(size)) 
+then if it exists then it continues into the if-statement. Embedded in the if statment is another .find() which takes 
+theta(log(size)) again to see if the second key, being the position/index, then it continutes. The first thing to do, is
+doing an erase, first using the .find() which is again theta(log(size)) then the erase is theta(1) so it is theta(log(size))  
+for that line. Next is inserting into the map which as said before is theta(log(size)) because it is only inserting one elment into 
+the first map, then in the second which is theta(log(size)). Then the actual value is updated by calling my set() function which 
+is just a theta(1) setting the value to the parsed NumericExpression. Inside this ifstatment is adding all of the theta(log(size)) 
+together which a constant can be pulled out so, inside the if statement is theta(log(size)) . In the else statement it is the same
+but it does not delete by the key because it does not exists yet. Still the other two lines run at theta(log(size)), pulling out a constant so it is theta(log(size)) with a larger constant but it is still theta(log(size))  to find and set the value in an array.
+

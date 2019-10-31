@@ -1,7 +1,7 @@
-all: basic_interpreter
+all: hw4
 
-basic_interpreter: main.cpp interpreter.o command.o arithmetic.o boolean.o
-	 g++ -g -Wall -std=c++11 main.cpp -o basic_interpreter interpreter.o command.o arithmetic.o boolean.o
+hw4: main.cpp interpreter.o command.o arithmetic.o boolean.o
+	 g++ -g -Wall -std=c++11 main.cpp -o hw4 interpreter.o command.o arithmetic.o boolean.o
 
 interpreter.o: interpreter/interpreter.cpp interpreter/interpreter.h 
 	g++ -g -Wall -c -std=c++11 $< -o interpreter.o

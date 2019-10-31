@@ -102,9 +102,20 @@ NumericExpression* Interpreter::nexpParse(string toParse, int &position){
         }else if(op == '/'){
             prettyp = new DivisionExpression(left,right);
         }else{
-            prettyp = new DivisionExpression(left,right);
+
         }
-        prettyp->set(prettyp->get_result());
+        //if(done){
+            try{
+                prettyp->set(prettyp->get_result());
+
+            }
+            catch(exception& e){
+                error_string = e.what();
+                error_line = current_line_error;
+            }
+        //}
+        
+
         return prettyp;
     }
 }
@@ -336,7 +347,7 @@ void Interpreter::parse_let(string line){
                 ix += next[i];
             }
             o = 0;
-            index = nexpParse(ix, o);
+            index = nexpParse(ix, o); 
         }
         string nexp = "";
         for(unsigned int i = ix_string+1 ; i < next.size();i++){                //gets the rest of the string to go in the variable
@@ -344,8 +355,8 @@ void Interpreter::parse_let(string line){
             nexp += next[i];
         }
         o = 0;
-        //pretty print
-        NumericExpression* exp = nexpParse(nexp, o);
+        //pretty print     
+        NumericExpression* exp = nexpParse(nexp, o);     
         NumericExpression* ary = new ArVariable(variable, index);               //new array
         Command* let = new LetA(ary, exp);                                      //new let command for pretty printing
         out_lines.push_back(line_number + " " + let->format());
@@ -387,6 +398,7 @@ void Interpreter::parse(istream& in) {
         stringstream stream(line);
         stream >> line_number;
         stream >> command_name;
+        current_line_error = stoi(line_number);
         if(command_name == "END"){
         	Command* it_end = new End;
         	line_command[stoi(line_number)] = it_end;
@@ -448,6 +460,10 @@ void Interpreter::write(ostream& out) {
 void Interpreter::functionality(){
     map<int, Command*>::iterator it;
     for(it = line_command.begin(); it != line_command.end();){
+        if(it->first == error_line){
+            cout << "Error in line " << error_line << ": " << error_string << endl;
+            return;
+        }
         if(it->second->command_name() == "PRINT"){                  //Prints out the NUMERIC expression, newline after
             NumericExpression* printing =  it->second->get_nexp();
             if(printing->is_array() == -1){ //variable
@@ -462,8 +478,6 @@ void Interpreter::functionality(){
             }else{
                 cout << it->second->get_nexp()->get_val() << "\n";
             }
-            it++;
-            continue;
         }else if(it->second->command_name() == "LETA"){
             int line = it->first; 
             string let_string = to_string(line) + " " + it->second->format();
@@ -474,7 +488,7 @@ void Interpreter::functionality(){
             parse_let(let_string);
         }else if(it->second->command_name() == "GOTO"){
             if(line_command.find(it->second->get_jline()) == line_command.end() ){                    //jline does not exist
-                cout <<  "Error in line "<< it->first << " :GOTO non-existent line <" << it->second->get_jline() << ">.\n";
+                cout <<  "Error in line "<< it->first << ": GOTO non-existent line <" << it->second->get_jline() << ">.\n";
                 return;
             }
             it = line_command.find(it->second->get_jline());
@@ -484,6 +498,7 @@ void Interpreter::functionality(){
             int line = it->first; 
             string let_string = to_string(line) + " " + it->second->format();
             parse_if(let_string);
+
             if(line_command.find(it->second->get_jline()) == line_command.end() ){                    //jline does not exist
                 cout << "Error in line "<< it->first << ": IF jump to non-existent line <" << it->second->get_jline() << ">.\n";
                 return;
@@ -511,6 +526,8 @@ void Interpreter::functionality(){
             it = line_command.find(jump);
             it++;
             continue;
+        }else if(it->second->command_name() == "END"){
+            return;
         }
         it++;
     }

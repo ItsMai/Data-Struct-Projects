@@ -114,7 +114,9 @@ string DivisionExpression::format() const {
 
 int DivisionExpression::get_result(){
     if(this->right->get_val() == 0){
-        throw invalid_argument("divided by zero");
+        string out = " Division by zero: " + this->left->format() + " = " + to_string(this->left->get_val()) +
+        ", " + this->right->format() + " = " + to_string(this->right->get_val());
+        throw invalid_argument(out);
     }
     val_ = (int)(this->left->get_val() / this->right->get_val());
     return val_;

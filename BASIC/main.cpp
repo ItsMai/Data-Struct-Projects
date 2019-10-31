@@ -20,6 +20,6 @@ int main(int argc, char* argv[]) {
     
     Interpreter interpreter(input);
     interpreter.functionality();
-    interpreter.write(cout);
+    // interpreter.write(cout);
     return 0;
 }
