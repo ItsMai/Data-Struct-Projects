@@ -57,9 +57,20 @@ private:
     /*
     Pretty printing = parsing to find the actual variable name for specific COMMANDS
     */
+    void parse_let(std::string);
+    /*
+    Special parse needed for command let incase the go sub calls the let line again
+    */
+    void parse_if(std:: string);
+    /*
+    Special parse needed for command let incase the go sub calls the let line again
+    and the bool result has changed
+    */
     std:: stack<int> lines_remembered;
     std:: map<std::string, NumericExpression*> int_variables;
     std:: map<std::string, std::map<int, NumericExpression* > > array_variables;
+    //determines how many times pretty print is put into the vector
+    bool done = false;
 };
 
 #endif 

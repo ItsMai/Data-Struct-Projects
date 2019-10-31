@@ -14,18 +14,11 @@ public:
 	virtual ~Command(){}
     virtual std::string format() const = 0;
     virtual std::string command_name(){return "Error";}
-    virtual NumericExpression* get_nexp(){
-        NumericExpression* j = new Constant(0);
-        return j;
-    }
+    virtual NumericExpression* get_nexp();
+    virtual BooleanExpression* get_check();
     virtual int get_jline(){return -1;}
 };
-class Empty: public Command{
-    virtual ~Empty(){}
-    virtual std::string format() const{return "EMPTY";}
-    std::string command_name(){return "EMPTY";}
 
-};
 class End: public Command{
     virtual ~End(){}
     virtual std::string format() const{return "END";}
@@ -75,11 +68,9 @@ public:
     virtual std::string format() const;
     std::string command_name(){return "LETA";}
 
-
 private:
     NumericExpression* array_; //maybe numeric
     NumericExpression* nexp_; //maybe numeric
-
 };
 /*
 Just jumps to a line
@@ -104,6 +95,7 @@ public:
     virtual ~IfThen();
     virtual std::string format() const;
     std::string command_name(){return "IFTHEN";}
+    virtual BooleanExpression* get_check();
     virtual int get_jline(){return jline_;}
 
 private:

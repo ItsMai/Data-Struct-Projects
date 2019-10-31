@@ -8,6 +8,17 @@
 #include <fstream>
 
 using namespace std;
+NumericExpression* Command::get_nexp(){
+	NumericExpression* empty = new Constant(0);
+	return empty;
+}
+BooleanExpression* Command::get_check(){
+	NumericExpression* empty_l = new Constant(0);
+	NumericExpression* empty_r = new Constant(0);
+	BooleanExpression* empty = new EqualsExpression(empty_l,empty_r);
+	return empty;
+}
+
 /*
 ==========PRINT==========
 */
@@ -73,6 +84,9 @@ IfThen::~IfThen(){
 
 string IfThen::format()const{
 	return "IF " + this->check_->format() + " THEN <" + to_string(jline_) + ">";
+}
+BooleanExpression* IfThen::get_check(){
+	return check_;
 }
 /*
 ==========GOSUB==========

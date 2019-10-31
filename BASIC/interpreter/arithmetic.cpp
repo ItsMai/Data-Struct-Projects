@@ -8,6 +8,12 @@
 #include <stdexcept>
 //test typeid() == typeid()
 using namespace std;
+
+NumericExpression* NumericExpression::get_array(){
+    NumericExpression* empty = new Constant(0);
+    return empty;
+}
+
 /*
         Constants
 */
@@ -51,6 +57,9 @@ string ArVariable::format() const {
 }
 string ArVariable::get_name(){
     return name_;
+}
+NumericExpression* ArVariable::get_array(){
+    return array_;
 }
 /*
 ++++++++++Addition function+++++++++++++

@@ -14,6 +14,9 @@ public:
     int get_val(){return val_;}
     virtual int get_result(){return 0;}
     void set(int k){ val_ = k;}
+    virtual int is_array(){return 0;}
+    virtual std::string get_name(){return "error";}
+    virtual NumericExpression* get_array();
 protected:
     int val_;
 
@@ -39,7 +42,7 @@ public:
     virtual~IntVariable(){}
     virtual std::string format() const;
     std::string get_name();
-    bool is_array(){return false;}
+    int is_array(){return -1;}
 
 private:
     std::string name_;
@@ -55,7 +58,8 @@ public:
     virtual~ArVariable();
     virtual std::string format() const;
     std::string get_name();
-    bool is_array(){return true;}
+    int is_array(){return 1;}
+    NumericExpression* get_array();
 private:
 	std::string name_;
     NumericExpression* array_;
